@@ -17,7 +17,7 @@ BEGIN
              2       일일 가입자 수(Idx)         INT
              3       일일 접속자 수              INT
              4       일일 구매자 수              INT
-             5       일일 총 매출                BIGINT    -- 제거
+             5       일일 총 매출                BIGINT 
              6       평균 CCU                    INT
              7       최대 CCU                    INT
              8       최대 CCU 시간               DATETIME

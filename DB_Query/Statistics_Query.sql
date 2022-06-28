@@ -13,29 +13,29 @@ BEGIN
         
         /*------------------------------------------------------
             Type  /         DESC              /  Data Type
-             1       ÃÑ À¯Àú ¼ö                  INT
-             2       ÀÏÀÏ °¡ÀÔÀÚ ¼ö(Idx)         INT
-             3       ÀÏÀÏ Á¢¼ÓÀÚ ¼ö              INT
-             4       ÀÏÀÏ ±¸¸ÅÀÚ ¼ö              INT
-             5       ÀÏÀÏ ÃÑ ¸ÅÃâ                BIGINT    -- Á¦°Å
-             6       Æò±Õ CCU                    INT
-             7       ÃÖ´ë CCU                    INT
-             8       ÃÖ´ë CCU ½Ã°£               DATETIME
-             9       ÀÏÀÏ Å»ÅğÀÚ ¼ö              INT
-             10      ÀÏÀÏ Å»ÅğÃ¶È¸ÀÚ ¼ö          INT
-             11      ÀÏÀÏ °¡ÀÔÀÚ ¼ö(device_key)  INT
-			 12		 ÀÏÀÏ ÇÃ·¹ÀÌ Å¸ÀÓ			 INT
-			 13		 ÀÏÀÏ À¯Àú´ç Æò±Õ ¼¼¼Ç ¼ö	 INT
-			 14		 ÀÏÀÏ Æò±Õ À¯Áö ½Ã°£		 INT
-			 15		 ÀÏÀÏ °¡ÀÔÀÚ ¼ö(effective)	 INT
-			 16		 ÀÏÀÏ ÃÑ ¼¼¼Ç ¼ö			 INT
+             1       ì´ ìœ ì € ìˆ˜                  INT
+             2       ì¼ì¼ ê°€ì…ì ìˆ˜(Idx)         INT
+             3       ì¼ì¼ ì ‘ì†ì ìˆ˜              INT
+             4       ì¼ì¼ êµ¬ë§¤ì ìˆ˜              INT
+             5       ì¼ì¼ ì´ ë§¤ì¶œ                BIGINT    -- ì œê±°
+             6       í‰ê·  CCU                    INT
+             7       ìµœëŒ€ CCU                    INT
+             8       ìµœëŒ€ CCU ì‹œê°„               DATETIME
+             9       ì¼ì¼ íƒˆí‡´ì ìˆ˜              INT
+             10      ì¼ì¼ íƒˆí‡´ì² íšŒì ìˆ˜          INT
+             11      ì¼ì¼ ê°€ì…ì ìˆ˜(device_key)  INT
+	     12	     ì¼ì¼ í”Œë ˆì´ íƒ€ì„		  INT
+	     13	     ì¼ì¼ ìœ ì €ë‹¹ í‰ê·  ì„¸ì…˜ ìˆ˜	INT
+	     14	     ì¼ì¼ í‰ê·  ìœ ì§€ ì‹œê°„	  INT
+	     15	     ì¼ì¼ ê°€ì…ì ìˆ˜(effective)    INT
+	     16	     ì¼ì¼ ì´ ì„¸ì…˜ ìˆ˜		    INT
         ------------------------------------------------------*/
 
         DECLARE
             @iS          INT          = 1
         ,   @iE          INT          = 0
-        ,   @start_date  NVARCHAR(19) = CONVERT(NVARCHAR(10), DATEADD(DD, -1, @now_date), 120) + N' 00:00:00' -- ±âÁØ ½ÃÀÛ ½Ã°¢ ex) 2016-01-01
-        ,   @end_date    NVARCHAR(19) = CONVERt(NVARCHAR(10),                 @now_date , 120) + N' 00:00:00' -- ±âÁØ Á¾·á ½Ã°¢ ex) 2016-01-02
+        ,   @start_date  NVARCHAR(19) = CONVERT(NVARCHAR(10), DATEADD(DD, -1, @now_date), 120) + N' 00:00:00' -- ê¸°ì¤€ ì‹œì‘ ì‹œê° ex) 2016-01-01
+        ,   @end_date    NVARCHAR(19) = CONVERt(NVARCHAR(10),                 @now_date , 120) + N' 00:00:00' -- ê¸°ì¤€ ì¢…ë£Œ ì‹œê° ex) 2016-01-02
 
         DECLARE @data TABLE
         (
@@ -49,76 +49,76 @@ BEGIN
 		,	app_store	   INT
         )
         
-        --´©Àû ÃÑ À¯Àú ¼ö
+        --ëˆ„ì  ì´ ìœ ì € ìˆ˜
         INSERT @data (type, location, app_store, value_int)
         SELECT 1, -1, -1, count(*) FROM dbo.signup_log WITH(NOLOCK) WHERE log_time < @end_date
 
-        --ÀÏÀÏ ÃÑ °¡ÀÔÀÚ ¼ö(account_idx ±âÁØ)
+        --ì¼ì¼ ì´ ê°€ì…ì ìˆ˜(account_idx ê¸°ì¤€)
         INSERT @data (type, location, app_store, value_int)
         SELECT 2, -1, -1, count(*) FROM dbo.signup_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date
 
-        --ÀÏÀÏ Á¢¼ÓÀÚ ¼ö
+        --ì¼ì¼ ì ‘ì†ì ìˆ˜
         INSERT @data (type, location, app_store, value_int)
         SELECT 3, -1, -1, count(*) FROM ( SELECT account_idx FROM dbo.daily_unique_login WITH(NOLOCK) WHERE login_date = @start_date GROUP BY account_idx) AS a
 
-        --ÀÏÀÏ ±¸¸ÅÀÚ ¼ö
+        --ì¼ì¼ êµ¬ë§¤ì ìˆ˜
         INSERT @data (type, location, app_store, value_int)
         SELECT 4, -1, -1, count(*) FROM ( SELECT account_idx FROM dbo.purchase_cash_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date GROUP BY account_idx ) AS a
 
-        --ÀÏÀÏ ÃÑ ¸ÅÃâ
+        --ì¼ì¼ ì´ ë§¤ì¶œ
         INSERT @data (type, value_bigint)
         SELECT 5, ISNULL(SUM(real_price),0) FROM dbo.purchase_cash_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date
 
-        --ÀÏÀÏ Æò±Õ CCU
+        --ì¼ì¼ í‰ê·  CCU
         INSERT @data (type, location, app_store, value_int)
         SELECT 6, -1, -1, ISNULL(AVG(ccu_count),0) FROM dbo.ccu_log WITH(NOLOCK) WHERE ccu_time >= @start_date AND ccu_time < @end_date
 
-        --ÀÏÀÏ ÃÖ´ë CCU
+        --ì¼ì¼ ìµœëŒ€ CCU
         INSERT @data (type, location, app_store, value_int)
         SELECT 7, -1, -1, ISNULL(MAX(ccu_count),0) FROM dbo.ccu_log WITH(NOLOCK) WHERE ccu_time >= @start_date AND ccu_time < @end_date
 
-        --ÀÏÀÏ ÃÖ´ë CCU½Ã°£
+        --ì¼ì¼ ìµœëŒ€ CCUì‹œê°„
         INSERT @data (type, location, app_store, value_date)
         SELECT 8, -1, -1, ISNULL(MAX(a.ccu_time), @start_date) FROM dbo.ccu_log AS a WITH(NOLOCK) INNER JOIN (SELECT ISNULL(MAX(ccu_count),0) AS max_ccu FROM dbo.ccu_log WITH(NOLOCK) WHERE ccu_time >= @start_date AND ccu_time < @end_date ) AS b ON a.ccu_count = b.max_ccu WHERE ccu_time >= @start_date AND ccu_time < @end_date
 
-        --ÀÏÀÏ Å»ÅğÀÚ ¼ö
+        --ì¼ì¼ íƒˆí‡´ì ìˆ˜
         INSERT @data (type, location, app_store, value_int)
         SELECT 9, -1, -1, count(*) FROM dbo.withdrawal_log WITH(NOLOCK) WHERE log_type = 1 AND log_time >= @start_date AND log_time < @now_date
 
-        --ÀÏÀÏ Å»Åğ Ã¶È¸ÀÚ ¼ö
+        --ì¼ì¼ íƒˆí‡´ ì² íšŒì ìˆ˜
         INSERT @data (type, location, app_store, value_int)
         SELECT 10, -1, -1, count(*) FROM dbo.withdrawal_log WITH(NOLOCK) WHERE log_type = 0 AND log_time >= @start_date AND log_time < @now_date
 
-        --ÀÏÀÏ ÃÑ °¡ÀÔÀÚ ¼ö(device_key ±âÁØ)
+        --ì¼ì¼ ì´ ê°€ì…ì ìˆ˜(device_key ê¸°ì¤€)
         INSERT @data (type, location, app_store, value_int)
         SELECT 11, -1, -1, COUNT(*) FROM ( SELECT count(*) AS cnt FROM dbo.signup_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date GROUP BY device_key) AS a
 
-		--ÀÏÀÏ ÃÑ ÇÃ·¹ÀÌ Å¸ÀÓ
-		INSERT @data (type, location, app_store, value_bigint)
-		SELECT 12, -1, -1, ISNULL(SUM(play_time_sec), 0) AS play_time FROM dbo.logout_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date
+	--ì¼ì¼ ì´ í”Œë ˆì´ íƒ€ì„
+	INSERT @data (type, location, app_store, value_bigint)
+	SELECT 12, -1, -1, ISNULL(SUM(play_time_sec), 0) AS play_time FROM dbo.logout_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date
 
-		--ÀÏÀÏ À¯Àú´ç Æò±Õ ¼¼¼Ç(Login/Out) ¼ö
-		INSERT @data (type, location, app_store, value_nvarchar)
-		SELECT 13, -1, -1, (SELECT CASE WHEN login_cnt > 0 THEN CONVERT(NVARCHAR(20), CONVERT(DECIMAL(7,2), ( ( login_cnt * 1.0 ) / DAU )) ) ELSE N'0' END AS value_nvarchar FROM ( SELECT @start_date AS start_date, COUNT(*) AS login_cnt FROM dbo.login_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date) AS a
+	--ì¼ì¼ ìœ ì €ë‹¹ í‰ê·  ì„¸ì…˜(Login/Out) ìˆ˜
+	INSERT @data (type, location, app_store, value_nvarchar)
+	SELECT 13, -1, -1, (SELECT CASE WHEN login_cnt > 0 THEN CONVERT(NVARCHAR(20), CONVERT(DECIMAL(7,2), ( ( login_cnt * 1.0 ) / DAU )) ) ELSE N'0' END AS value_nvarchar FROM ( SELECT @start_date AS start_date, COUNT(*) AS login_cnt FROM dbo.login_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date) AS a
 						JOIN (SELECT @start_date AS start_date, value_int AS DAU FROM @data WHERE type = 3 AND location = -1) AS b ON a.start_date = b.start_date )
 
-		--ÇÑ¹øÀÇ ¼¼¼Ç(Login/Out)´ç Æò±Õ À¯Áö ½Ã°£
-		INSERT @data (type, location, app_store, value_nvarchar)
-		SELECT 14, -1, -1, (SELECT CASE WHEN pt > 0 THEN CONVERT(NVARCHAR(20), CONVERT(DECIMAL(7,2), ( ( pt * 1.0 ) / login_cnt / 60)) ) ELSE N'0' END AS value_nvarchar FROM ( SELECT @start_date AS start_date, SUM(CAST(play_time_sec AS bigint)) as pt FROM dbo.logout_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date) AS a
+	--í•œë²ˆì˜ ì„¸ì…˜(Login/Out)ë‹¹ í‰ê·  ìœ ì§€ ì‹œê°„
+	INSERT @data (type, location, app_store, value_nvarchar)
+	SELECT 14, -1, -1, (SELECT CASE WHEN pt > 0 THEN CONVERT(NVARCHAR(20), CONVERT(DECIMAL(7,2), ( ( pt * 1.0 ) / login_cnt / 60)) ) ELSE N'0' END AS value_nvarchar FROM ( SELECT @start_date AS start_date, SUM(CAST(play_time_sec AS bigint)) as pt FROM dbo.logout_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date) AS a
 						JOIN (SELECT @start_date AS start_date, COUNT(*) AS login_cnt FROM dbo.login_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date) AS b ON a.start_date = b.start_date )
 
-		--ÀÏÀÏ ÃÑ °¡ÀÔÀÚ ¼ö(effective ±âÁØ)
-		INSERT @data (type, location, app_store, value_int)
-		SELECT 15, -1, -1, (SELECT COUNT(*) FROM dbo.MPX_GAME_DungeonSignup WHERE create_time >= @start_date AND create_time < @end_date)
+	--ì¼ì¼ ì´ ê°€ì…ì ìˆ˜(effective ê¸°ì¤€)
+	INSERT @data (type, location, app_store, value_int)
+	SELECT 15, -1, -1, (SELECT COUNT(*) FROM dbo.MPX_GAME_DungeonSignup WHERE create_time >= @start_date AND create_time < @end_date)
 
-		--ÀÏÀÏ ÃÑ ¼¼¼Ç ¼ö
-		INSERT @data (type, location, app_store, value_int)
-		SELECT 16, -1, -1, COUNT(*) AS login_cnt FROM dbo.login_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date
+	--ì¼ì¼ ì´ ì„¸ì…˜ ìˆ˜
+	INSERT @data (type, location, app_store, value_int)
+	SELECT 16, -1, -1, COUNT(*) AS login_cnt FROM dbo.login_log WITH(NOLOCK) WHERE log_time >= @start_date AND log_time < @end_date
 
         SELECT
             @iE = MAX(no) FROM @data
 
-		-- µ¥ÀÌÅÍ Á¸Àç½Ã Update, Á¸ÀçÇÏÁö ¾ÊÀ¸¸é Insert
+	-- ë°ì´í„° ì¡´ì¬ì‹œ Update, ì¡´ì¬í•˜ì§€ ì•Šìœ¼ë©´ Insert
         WHILE(@iS <= @iE)
         BEGIN
             
